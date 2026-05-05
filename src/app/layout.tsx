@@ -11,9 +11,9 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   icons: {
-    icon: '/icon.svg',
-    shortcut: '/icon.svg',
-    apple: '/icon.svg',
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
   title: '印刷解析度檢查 | PrintSizer — 你的圖片，能印多大？',
   description: '上傳圖片，立即分析解析度與最佳印刷尺寸。完全在你的裝置上運行，不上傳任何伺服器。',
@@ -46,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="zh-TW" className={jakarta.variable}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className={`${jakarta.className} bg-[#f5f5f7] min-h-screen`}>
         {children}
