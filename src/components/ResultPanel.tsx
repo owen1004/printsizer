@@ -107,9 +107,6 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
     // 8. 各印刷品列錯開
     tl.from('.gs-size-row', { x: -10, opacity: 0, duration: 0.25, stagger: 0.04 }, '-=0.15')
 
-    // 9. 底部按鈕
-    tl.from('.gs-bottom', { y: 12, opacity: 0, duration: 0.35, stagger: 0.08 }, '-=0.1')
-
   }, { scope: containerRef })
 
   return (
@@ -306,15 +303,15 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
       </div>
 
       {/* ── 底部 CTA ── */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 animate-fade-in-up animate-delay-300">
         <a href="https://owenstudio.netlify.app/#plans" target="_blank" rel="noopener noreferrer"
-          className="gs-bottom flex-1 py-3 rounded-2xl bg-gray-900 text-white text-sm font-semibold
+          className="flex-1 py-3 rounded-2xl bg-gray-900 text-white text-sm font-semibold
                      text-center tracking-tight hover:bg-gray-700 active:scale-[0.97]
                      transition-all duration-150">
           查看印刷服務 →
         </a>
         <a href="https://lin.ee/V78i92c" target="_blank" rel="noopener noreferrer"
-          className="gs-bottom flex-1 py-3 rounded-2xl border border-[#06C755] text-[#06C755]
+          className="flex-1 py-3 rounded-2xl border border-[#06C755] text-[#06C755]
                      text-sm font-semibold text-center tracking-tight
                      hover:bg-green-50 active:scale-[0.97] transition-all duration-150
                      flex items-center justify-center gap-1.5">
@@ -328,7 +325,7 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
       {/* ── 重新上傳 ── */}
       <button
         onClick={onReset}
-        className="gs-bottom w-full py-3.5 rounded-2xl bg-white apple-shadow border border-gray-200
+        className="animate-fade-in-up animate-delay-300 w-full py-3.5 rounded-2xl bg-white apple-shadow border border-gray-200
                    text-gray-600 font-semibold text-sm tracking-tight
                    hover:border-cyan-300 hover:text-cyan-600
                    active:scale-[0.98] transition-all duration-200"
