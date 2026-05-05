@@ -69,53 +69,71 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
     <div className="space-y-4 animate-fade-in-up">
 
       {/* ── 評分卡 ── */}
-      <div className="bg-white rounded-3xl apple-shadow p-5">
-        <div className="flex gap-4 items-start">
+      <div className="bg-white rounded-3xl apple-shadow overflow-hidden">
 
-          {/* 預覽圖（放大至 96px） */}
-          {previewUrl && (
-            <div className="flex-shrink-0 w-24 h-24 rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-              <Image src={previewUrl} alt="上傳的圖片" width={96} height={96}
-                className="w-full h-full object-cover" unoptimized />
-            </div>
-          )}
-
-          {/* 資訊區 */}
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-0.5">解析度評級</p>
-            <p className="text-xl font-bold tracking-tight text-gray-900">{info.qualityLabel}</p>
-            <p className="text-xs text-gray-500 mt-1">
-              {info.width.toLocaleString()} × {info.height.toLocaleString()} px
-              &ensp;·&ensp;{formatFileSize(info.fileSize)}
-              &ensp;·&ensp;{info.aspectRatio.w}:{info.aspectRatio.h}
-            </p>
-            {/* 品質計量條 */}
-            <div className="mt-3">
-              <div className="relative h-1.5 rounded-full overflow-hidden bg-gradient-to-r from-red-400 via-amber-400 to-green-400">
-                <div
-                  className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white border-2 shadow-sm transition-all duration-700 ${METER_DOT[info.quality]}`}
-                  style={{ left: `calc(${cfg.meterPct}% - 6px)` }}
-                />
-              </div>
-              <div className="flex justify-between text-[10px] text-gray-500 mt-1 select-none">
-                <span>不足</span><span>優秀</span>
-              </div>
+        {/* 全寬預覽圖 */}
+        {previewUrl && (
+          <div className="relative w-full h-52 bg-gray-100">
+            <Image
+              src={previewUrl} alt="上傳的圖片"
+              fill className="object-contain" unoptimized
+            />
+            {/* 評級徽章浮疊右上角 */}
+            <div className="absolute top-3 right-3 px-3 py-1 rounded-full backdrop-blur-md bg-white/80 shadow-sm">
+              <span
+                className="text-base font-black"
+                style={{
+                  background: cfg.gradient,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                {cfg.label}
+              </span>
             </div>
           </div>
+        )}
 
-          {/* 評級標籤（漸層色） */}
-          <div className="flex-shrink-0">
-            <span
-              className="text-2xl font-black"
-              style={{
-                background: cfg.gradient,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              {cfg.label}
-            </span>
+        {/* 資訊區 */}
+        <div className="px-5 pt-4 pb-5">
+          {/* 若無預覽圖，評級顯示在右側 */}
+          {!previewUrl && (
+            <div className="flex justify-between items-start mb-1">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">解析度評級</p>
+              <span
+                className="text-2xl font-black"
+                style={{
+                  background: cfg.gradient,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                {cfg.label}
+              </span>
+            </div>
+          )}
+          {previewUrl && (
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">解析度評級</p>
+          )}
+          <p className="text-xl font-bold tracking-tight text-gray-900">{info.qualityLabel}</p>
+          <p className="text-xs text-gray-500 mt-1">
+            {info.width.toLocaleString()} × {info.height.toLocaleString()} px
+            &ensp;·&ensp;{formatFileSize(info.fileSize)}
+            &ensp;·&ensp;{info.aspectRatio.w}:{info.aspectRatio.h}
+          </p>
+          {/* 品質計量條 */}
+          <div className="mt-3">
+            <div className="relative h-1.5 rounded-full overflow-hidden bg-gradient-to-r from-red-400 via-amber-400 to-green-400">
+              <div
+                className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white border-2 shadow-sm transition-all duration-700 ${METER_DOT[info.quality]}`}
+                style={{ left: `calc(${cfg.meterPct}% - 6px)` }}
+              />
+            </div>
+            <div className="flex justify-between text-[10px] text-gray-500 mt-1 select-none">
+              <span>不足</span><span>優秀</span>
+            </div>
           </div>
         </div>
       </div>
