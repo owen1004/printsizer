@@ -1,0 +1,64 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#f5f5f7"/>
+
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Card -->
+  <rect x="80" y="80" width="1040" height="470" rx="40" fill="white"
+        filter="drop-shadow(0 8px 32px rgba(0,0,0,0.08))"/>
+
+  <!-- App icon -->
+  <rect x="140" y="160" width="80" height="80" rx="20" fill="url(#iconGrad)"/>
+  <text x="180" y="215" text-anchor="middle" font-size="40">🖨</text>
+
+  <!-- App name -->
+  <text x="240" y="200" font-family="system-ui, -apple-system, sans-serif"
+        font-size="28" font-weight="600" fill="#1d1d1f">PrintSizer</text>
+  <text x="240" y="232" font-family="system-ui, -apple-system, sans-serif"
+        font-size="18" font-weight="400" fill="#6e6e73">圖片解析度檢查工具</text>
+
+  <!-- Main headline -->
+  <text x="140" y="340" font-family="system-ui, -apple-system, sans-serif"
+        font-size="72" font-weight="800" fill="url(#textGrad)">你的圖片，能印多大？</text>
+
+  <!-- Sub text -->
+  <text x="140" y="400" font-family="system-ui, -apple-system, sans-serif"
+        font-size="28" font-weight="400" fill="#6e6e73">
+    上傳圖片，立即分析解析度與最佳印刷尺寸
+  </text>
+
+  <!-- Feature pills -->
+  <rect x="140" y="440" width="140" height="44" rx="22" fill="#f0f9ff"/>
+  <text x="210" y="468" text-anchor="middle" font-family="system-ui" font-size="18" fill="#0891b2">✓ 不上傳</text>
+
+  <rect x="296" y="440" width="160" height="44" rx="22" fill="#f0f9ff"/>
+  <text x="376" y="468" text-anchor="middle" font-family="system-ui" font-size="18" fill="#0891b2">✓ 支援 HEIC</text>
+
+  <rect x="472" y="440" width="180" height="44" rx="22" fill="#f0f9ff"/>
+  <text x="562" y="468" text-anchor="middle" font-family="system-ui" font-size="18" fill="#0891b2">✓ 即時分析</text>
+
+  <!-- Right: decorative print sizes -->
+  <rect x="820" y="180" width="240" height="60" rx="16" fill="#f0fdf4"/>
+  <text x="940" y="218" text-anchor="middle" font-family="system-ui" font-size="20" font-weight="600" fill="#16a34a">名片 ✓ 極致 300 DPI</text>
+
+  <rect x="820" y="256" width="240" height="60" rx="16" fill="#eff6ff"/>
+  <text x="940" y="294" text-anchor="middle" font-family="system-ui" font-size="20" font-weight="600" fill="#2563eb">A4 傳單 ✓ 優秀 210 DPI</text>
+
+  <rect x="820" y="332" width="240" height="60" rx="16" fill="#fefce8"/>
+  <text x="940" y="370" text-anchor="middle" font-family="system-ui" font-size="20" font-weight="600" fill="#ca8a04">A3 海報 ✓ 良好 148 DPI</text>
+
+  <rect x="820" y="408" width="240" height="60" rx="16" fill="#f9fafb"/>
+  <text x="940" y="446" text-anchor="middle" font-family="system-ui" font-size="20" font-weight="600" fill="#6b7280">易拉展  ✗ 不建議</text>
+</svg>
