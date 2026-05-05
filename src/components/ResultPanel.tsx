@@ -13,15 +13,17 @@ const OVERALL_CONFIG: Record<ImageInfo['quality'], {
   label: string; meterPct: number; gradient: string
 }> = {
   excellent: { label: '優秀', meterPct: 93, gradient: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' },
-  good:      { label: '良好', meterPct: 68, gradient: 'linear-gradient(135deg, #3B82F6 0%, #6366F1 100%)' },
-  fair:      { label: '尚可', meterPct: 40, gradient: 'linear-gradient(135deg, #F59E0B 0%, #F97316 100%)' },
-  poor:      { label: '不足', meterPct: 14, gradient: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)' },
+  good:      { label: '良好', meterPct: 72, gradient: 'linear-gradient(135deg, #3B82F6 0%, #6366F1 100%)' },
+  fair:      { label: '尚可', meterPct: 50, gradient: 'linear-gradient(135deg, #F59E0B 0%, #F97316 100%)' },
+  low:       { label: '偏低', meterPct: 28, gradient: 'linear-gradient(135deg, #F97316 0%, #EF4444 100%)' },
+  poor:      { label: '不足', meterPct: 8,  gradient: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)' },
 }
 
 const METER_DOT: Record<ImageInfo['quality'], string> = {
   excellent: 'border-green-500',
   good:      'border-blue-500',
   fair:      'border-amber-500',
+  low:       'border-orange-500',
   poor:      'border-red-500',
 }
 

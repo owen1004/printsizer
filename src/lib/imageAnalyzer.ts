@@ -7,7 +7,7 @@ export interface ImageInfo {
   fileSize: number
   fileName: string
   fileType: string
-  quality: 'excellent' | 'good' | 'fair' | 'poor'
+  quality: 'excellent' | 'good' | 'fair' | 'low' | 'poor'
   qualityLabel: string
   maxPrintSizes: PrintSize[]
   dpiLevels: DpiLevel[]
@@ -58,19 +58,33 @@ function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b)
 }
 
-function getQuality(width: number, height: number): ImageInfo['quality'] {
-  const px = Math.max(width, height)
-  if (px >= 4000) return 'excellent'
-  if (px >= 2000) return 'good'
-  if (px >= 1000) return 'fair'
-  return 'poor'
+/**
+ * 根據「≥150 DPI 能達到的最大印刷尺寸」決定整體評級，
+ * 避免「整體不足但名片品質優秀」的矛盾顯示。
+ */
+function getQuality(printSizes: PrintSize[]): ImageInfo['quality'] {
+  // ≥150 DPI 才算「高品質」
+  const goodSizes = printSizes.filter((s) => s.dpi >= 150)
+  if (goodSizes.length === 0) return 'poor'
+
+  const largest = goodSizes[goodSizes.length - 1] // 陣列已從小排到大
+
+  const bigFormats    = ['A3 海報', 'A2 海報', 'A1 海報', '易拉展']
+  const mediumFormats = ['A4 傳單']
+  const smallFormats  = ['A5 傳單', 'A6 明信片', 'DM 卡片']
+
+  if (bigFormats.includes(largest.name))    return 'excellent'
+  if (mediumFormats.includes(largest.name)) return 'good'
+  if (smallFormats.includes(largest.name))  return 'fair'
+  return 'low' // 只有名片等級
 }
 
 const QUALITY_LABELS: Record<ImageInfo['quality'], string> = {
   excellent: '優秀 — 可印大型海報',
-  good:      '良好 — 可印 A3/A4',
-  fair:      '尚可 — 建議 A5 以下',
-  poor:      '不足 — 印出後可能模糊',
+  good:      '良好 — 可印 A4 傳單',
+  fair:      '尚可 — 適合 A5 以下',
+  low:       '偏低 — 適合名片・小型印品',
+  poor:      '不足 — 建議換更高畫質圖片',
 }
 
 function calcPrintSizes(pixelWidth: number, pixelHeight: number): PrintSize[] {
@@ -143,8 +157,9 @@ export async function analyzeImage(file: File): Promise<ImageInfo> {
   const height = img.naturalHeight
   if (width === 0 || height === 0) throw new Error('無法讀取圖片尺寸')
 
-  const quality  = getQuality(width, height)
-  const divisor  = gcd(width, height)
+  const divisor      = gcd(width, height)
+  const maxPrintSizes = calcPrintSizes(width, height)
+  const quality       = getQuality(maxPrintSizes)  // 依實際可印尺寸評級
 
   return {
     width,
@@ -154,7 +169,7 @@ export async function analyzeImage(file: File): Promise<ImageInfo> {
     fileType:      file.type || 'image/heic',
     quality,
     qualityLabel:  QUALITY_LABELS[quality],
-    maxPrintSizes: calcPrintSizes(width, height),
+    maxPrintSizes,
     dpiLevels:     calcDpiLevels(width, height),
     aspectRatio:   { w: width / divisor, h: height / divisor },
   }
