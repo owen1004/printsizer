@@ -59,6 +59,28 @@ function gcd(a: number, b: number): number {
 }
 
 /**
+ * 將像素比例化簡為「易讀的小數字」。
+ * 先用 GCD 約分；若結果仍 > 30，用連分數逼近找最接近的分母 ≤ 30 的有理數。
+ */
+function niceRatio(w: number, h: number): { w: number; h: number } {
+  const d = gcd(w, h)
+  const rw = w / d
+  const rh = h / d
+  if (Math.max(rw, rh) <= 30) return { w: rw, h: rh }
+
+  const ratio = w / h
+  let bestW = rw, bestH = rh, bestErr = Infinity
+  for (let denom = 1; denom <= 30; denom++) {
+    const numer = Math.round(ratio * denom)
+    if (numer === 0) continue
+    const err = Math.abs(ratio - numer / denom)
+    if (err < bestErr) { bestErr = err; bestW = numer; bestH = denom }
+  }
+  const g = gcd(bestW, bestH)
+  return { w: bestW / g, h: bestH / g }
+}
+
+/**
  * 根據「≥150 DPI 能達到的最大印刷尺寸」決定整體評級，
  * 避免「整體不足但名片品質優秀」的矛盾顯示。
  */
@@ -157,9 +179,8 @@ export async function analyzeImage(file: File): Promise<ImageInfo> {
   const height = img.naturalHeight
   if (width === 0 || height === 0) throw new Error('無法讀取圖片尺寸')
 
-  const divisor      = gcd(width, height)
   const maxPrintSizes = calcPrintSizes(width, height)
-  const quality       = getQuality(maxPrintSizes)  // 依實際可印尺寸評級
+  const quality       = getQuality(maxPrintSizes)
 
   return {
     width,
@@ -171,6 +192,6 @@ export async function analyzeImage(file: File): Promise<ImageInfo> {
     qualityLabel:  QUALITY_LABELS[quality],
     maxPrintSizes,
     dpiLevels:     calcDpiLevels(width, height),
-    aspectRatio:   { w: width / divisor, h: height / divisor },
+    aspectRatio:   niceRatio(width, height),
   }
 }

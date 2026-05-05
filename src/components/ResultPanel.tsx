@@ -1,7 +1,12 @@
 'use client'
 
+import { useRef } from 'react'
 import Image from 'next/image'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 import { ImageInfo, PrintSize } from '@/lib/imageAnalyzer'
+
+gsap.registerPlugin(useGSAP)
 
 interface Props {
   info: ImageInfo
@@ -50,7 +55,6 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
-/** 最佳建議：找 ≥300 DPI（極致）的最大尺寸，找不到則退到 ≥150 DPI，再退到 ≥100 DPI */
 function getBestQualitySize(sizes: PrintSize[]): PrintSize | null {
   const extreme = sizes.filter((s) => s.dpi >= 300)
   if (extreme.length) return extreme[extreme.length - 1]
@@ -62,26 +66,67 @@ function getBestQualitySize(sizes: PrintSize[]): PrintSize | null {
 }
 
 export default function ResultPanel({ info, previewUrl, onReset }: Props) {
-  const cfg        = OVERALL_CONFIG[info.quality]
-  const printable  = info.maxPrintSizes.filter((s) => s.canPrint)
-  const bestSize   = printable[printable.length - 1]          // 最大可印
-  const goodSize   = getBestQualitySize(info.maxPrintSizes)   // 最佳建議
+  const cfg       = OVERALL_CONFIG[info.quality]
+  const printable = info.maxPrintSizes.filter((s) => s.canPrint)
+  const bestSize  = printable[printable.length - 1]
+  const goodSize  = getBestQualitySize(info.maxPrintSizes)
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const dotRef       = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
+
+    // 1. Hero 圖片 zoom-in + fade
+    tl.from('.gs-hero', { scale: 1.06, opacity: 0, duration: 0.55 })
+
+    // 2. 評級徽章從右滑入
+    tl.from('.gs-badge', { x: 18, opacity: 0, duration: 0.35, ease: 'back.out(2)' }, '-=0.25')
+
+    // 3. 資訊區往上淡入
+    tl.from('.gs-info', { y: 14, opacity: 0, duration: 0.4 }, '-=0.2')
+
+    // 4. 計量條指針彈跳到位（elastic）
+    if (dotRef.current) {
+      gsap.fromTo(
+        dotRef.current,
+        { left: '0%' },
+        { left: `${cfg.meterPct}%`, duration: 1.0, delay: 0.35, ease: 'elastic.out(1, 0.55)' }
+      )
+    }
+
+    // 5. 摘要卡片左右錯開入場
+    tl.from('.gs-card', { y: 22, opacity: 0, duration: 0.4, stagger: 0.1 }, '-=0.1')
+
+    // 6. CTA 卡
+    tl.from('.gs-cta', { y: 16, opacity: 0, duration: 0.4 }, '-=0.15')
+
+    // 7. DPI 等級列錯開
+    tl.from('.gs-dpi-row', { x: -14, opacity: 0, duration: 0.3, stagger: 0.06 }, '-=0.2')
+
+    // 8. 各印刷品列錯開
+    tl.from('.gs-size-row', { x: -10, opacity: 0, duration: 0.25, stagger: 0.04 }, '-=0.15')
+
+    // 9. 底部按鈕
+    tl.from('.gs-bottom', { y: 12, opacity: 0, duration: 0.35, stagger: 0.08 }, '-=0.1')
+
+  }, { scope: containerRef })
 
   return (
-    <div className="space-y-4 animate-fade-in-up">
+    <div ref={containerRef} className="space-y-4">
 
       {/* ── 評分卡 ── */}
       <div className="bg-white rounded-3xl apple-shadow overflow-hidden">
 
         {/* 全寬預覽圖 */}
         {previewUrl && (
-          <div className="relative w-full h-52 bg-gray-100">
+          <div className="gs-hero relative w-full h-52 bg-gray-100">
             <Image
               src={previewUrl} alt="上傳的圖片"
               fill className="object-contain" unoptimized
             />
-            {/* 評級徽章浮疊右上角 */}
-            <div className="absolute top-3 right-3 px-3 py-1 rounded-full backdrop-blur-md bg-white/80 shadow-sm">
+            {/* 評級徽章 */}
+            <div className="gs-badge absolute top-3 right-3 px-3 py-1 rounded-full backdrop-blur-md bg-white/80 shadow-sm">
               <span
                 className="text-base font-black"
                 style={{
@@ -98,22 +143,16 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
         )}
 
         {/* 資訊區 */}
-        <div className="px-5 pt-4 pb-5">
-          {/* 若無預覽圖，評級顯示在右側 */}
+        <div className="gs-info px-5 pt-4 pb-5">
           {!previewUrl && (
             <div className="flex justify-between items-start mb-1">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">解析度評級</p>
-              <span
-                className="text-2xl font-black"
-                style={{
-                  background: cfg.gradient,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                {cfg.label}
-              </span>
+              <span className="text-2xl font-black" style={{
+                background: cfg.gradient,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>{cfg.label}</span>
             </div>
           )}
           {previewUrl && (
@@ -125,12 +164,14 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
             &ensp;·&ensp;{formatFileSize(info.fileSize)}
             &ensp;·&ensp;{info.aspectRatio.w}:{info.aspectRatio.h}
           </p>
+
           {/* 品質計量條 */}
           <div className="mt-3">
-            <div className="relative h-1.5 rounded-full overflow-hidden bg-gradient-to-r from-red-400 via-amber-400 to-green-400">
+            <div className="relative h-1.5 rounded-full overflow-visible bg-gradient-to-r from-red-400 via-amber-400 to-green-400">
               <div
-                className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white border-2 shadow-sm transition-all duration-700 ${METER_DOT[info.quality]}`}
-                style={{ left: `calc(${cfg.meterPct}% - 6px)` }}
+                ref={dotRef}
+                className={`absolute w-3 h-3 rounded-full bg-white border-2 shadow-sm ${METER_DOT[info.quality]}`}
+                style={{ top: '50%', transform: 'translateY(-50%) translateX(-50%)', left: '0%' }}
               />
             </div>
             <div className="flex justify-between text-[10px] text-gray-500 mt-1 select-none">
@@ -140,20 +181,17 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
         </div>
       </div>
 
-      {/* ── 快訊卡（左：最佳建議　右：最大可印）── */}
-      <div className="grid grid-cols-2 gap-3 animate-fade-in-up animate-delay-100">
+      {/* ── 摘要卡（最佳建議 + 最大可印）── */}
+      <div className="grid grid-cols-2 gap-3">
 
-        {/* 左：最佳建議 */}
-        <div className="bg-white rounded-2xl apple-shadow p-4">
+        <div className="gs-card bg-white rounded-2xl apple-shadow p-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">最佳建議</p>
           {goodSize ? (
             <>
               <p className="text-lg font-bold tracking-tight text-gray-900">{goodSize.name}</p>
               <p className="text-xs text-gray-500 mt-0.5">{goodSize.width} × {goodSize.height} cm</p>
               <p className="text-xs text-gray-400 mt-1">{goodSize.desc}</p>
-              <span className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                PRINT_QUALITY[goodSize.printQuality].textColor
-              } bg-gray-100`}>
+              <span className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${PRINT_QUALITY[goodSize.printQuality].textColor} bg-gray-100`}>
                 {PRINT_QUALITY[goodSize.printQuality].label} · {goodSize.dpi} DPI
               </span>
             </>
@@ -162,17 +200,14 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
           )}
         </div>
 
-        {/* 右：最大可印 */}
-        <div className="bg-white rounded-2xl apple-shadow p-4">
+        <div className="gs-card bg-white rounded-2xl apple-shadow p-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">最大可印</p>
           {bestSize ? (
             <>
               <p className="text-lg font-bold tracking-tight text-gray-900">{bestSize.name}</p>
               <p className="text-xs text-gray-500 mt-0.5">{bestSize.width} × {bestSize.height} cm</p>
               <p className="text-xs text-gray-400 mt-1">{bestSize.desc}</p>
-              <span className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                PRINT_QUALITY[bestSize.printQuality].textColor
-              } bg-gray-100`}>
+              <span className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${PRINT_QUALITY[bestSize.printQuality].textColor} bg-gray-100`}>
                 {PRINT_QUALITY[bestSize.printQuality].label} · {bestSize.dpi} DPI
               </span>
             </>
@@ -183,12 +218,10 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
       </div>
 
       {/* ── 印刷服務 CTA ── */}
-      <div className="bg-white rounded-3xl apple-shadow overflow-hidden animate-fade-in-up animate-delay-100">
-        {/* 頂部漸層細線 */}
+      <div className="gs-cta bg-white rounded-3xl apple-shadow overflow-hidden">
         <div className="h-[3px] bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400" />
         <div className="p-5">
           <div className="flex items-center gap-3.5 mb-4">
-            {/* Icon */}
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-400 to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-sm">
               <svg aria-hidden="true" className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                 <path strokeLinecap="round" strokeLinejoin="round"
@@ -220,14 +253,14 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
       </div>
 
       {/* ── DPI 等級對照表 ── */}
-      <div className="bg-white rounded-3xl apple-shadow p-5 animate-fade-in-up animate-delay-100">
+      <div className="bg-white rounded-3xl apple-shadow p-5">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">各品質等級最大可印尺寸</p>
         <p className="text-xs text-gray-500 mb-4">保持原始比例，在不同 DPI 品質下的最大輸出尺寸</p>
         <div className="space-y-2">
           {info.dpiLevels.map((lvl) => {
             const s = DPI_ROW[lvl.label]
             return (
-              <div key={lvl.dpi} className={`flex items-center rounded-xl px-4 py-3 ${s.bg}`}>
+              <div key={lvl.dpi} className={`gs-dpi-row flex items-center rounded-xl px-4 py-3 ${s.bg}`}>
                 <div className="w-14 flex-shrink-0">
                   <span className={`text-xl font-black ${s.text}`}>{lvl.dpi}</span>
                   <span className={`text-xs ml-1 ${s.text} opacity-60`}>DPI</span>
@@ -247,7 +280,7 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
       </div>
 
       {/* ── 各印刷尺寸品質一覽 ── */}
-      <div className="bg-white rounded-3xl apple-shadow p-5 animate-fade-in-up animate-delay-200">
+      <div className="bg-white rounded-3xl apple-shadow p-5">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">各印刷尺寸品質</p>
         <p className="text-xs text-gray-500 mb-4">低於 72 DPI 不建議印製（視覺可見鋸齒）</p>
         <div className="space-y-1.5">
@@ -256,7 +289,7 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
             return (
               <div
                 key={size.name}
-                className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-colors
+                className={`gs-size-row flex items-center gap-3 rounded-xl px-4 py-3 transition-colors
                   ${size.canPrint ? 'bg-gray-50 hover:bg-gray-100/80' : 'opacity-40'}`}
               >
                 <span className={`w-2 h-2 rounded-full flex-shrink-0 ${q.dot}`} />
@@ -272,16 +305,16 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
         </div>
       </div>
 
-      {/* ── 底部簡版 CTA ── */}
-      <div className="flex gap-2 animate-fade-in-up animate-delay-300">
+      {/* ── 底部 CTA ── */}
+      <div className="flex gap-2">
         <a href="https://owenstudio.netlify.app/#plans" target="_blank" rel="noopener noreferrer"
-          className="flex-1 py-3 rounded-2xl bg-gray-900 text-white text-sm font-semibold
+          className="gs-bottom flex-1 py-3 rounded-2xl bg-gray-900 text-white text-sm font-semibold
                      text-center tracking-tight hover:bg-gray-700 active:scale-[0.97]
                      transition-all duration-150">
           查看印刷服務 →
         </a>
         <a href="https://lin.ee/V78i92c" target="_blank" rel="noopener noreferrer"
-          className="flex-1 py-3 rounded-2xl border border-[#06C755] text-[#06C755]
+          className="gs-bottom flex-1 py-3 rounded-2xl border border-[#06C755] text-[#06C755]
                      text-sm font-semibold text-center tracking-tight
                      hover:bg-green-50 active:scale-[0.97] transition-all duration-150
                      flex items-center justify-center gap-1.5">
@@ -295,10 +328,10 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
       {/* ── 重新上傳 ── */}
       <button
         onClick={onReset}
-        className="w-full py-3.5 rounded-2xl bg-white apple-shadow border border-gray-200
+        className="gs-bottom w-full py-3.5 rounded-2xl bg-white apple-shadow border border-gray-200
                    text-gray-600 font-semibold text-sm tracking-tight
                    hover:border-cyan-300 hover:text-cyan-600
-                   active:scale-[0.98] transition-all duration-200 animate-fade-in-up animate-delay-300"
+                   active:scale-[0.98] transition-all duration-200"
       >
         ↩ 重新上傳圖片
       </button>
