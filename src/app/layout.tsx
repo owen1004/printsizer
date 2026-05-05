@@ -10,6 +10,11 @@ const jakarta = Plus_Jakarta_Sans({
 })
 
 export const metadata: Metadata = {
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
   title: '印刷解析度檢查 | PrintSizer — 你的圖片，能印多大？',
   description: '上傳圖片，立即分析解析度與最佳印刷尺寸。完全在你的裝置上運行，不上傳任何伺服器。',
   openGraph: {
