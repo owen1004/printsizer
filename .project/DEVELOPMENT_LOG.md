@@ -29,14 +29,54 @@
 
 | 項目 | 內容 |
 |------|------|
-| **當前版本** | v0.1.0（Sprint 1） |
-| **當前階段** | PHASE_1（MVP 開發） |
-| **整體進度** | 70%（核心功能 + UI 完成，待 QA 與部署） |
+| **當前版本** | v1.0.0（正式上線） |
+| **當前階段** | PHASE_1 完成 — 已部署上線 |
+| **整體進度** | 100%（所有功能完成，已推送至 GitHub + Vercel） |
+| **Live URL** | https://printsizer.vercel.app |
+| **GitHub** | https://github.com/owen1004/printsizer |
 | **上次更新** | 2026-05-05 |
 
 ---
 
 ## 📋 開發記錄（最新在上）
+
+### [2026-05-05] /checkpoint — PrintSizer v1.0 專案完成存檔
+
+```
+- 狀態：v1.0 功能完整，已部署至 Vercel，正式上線
+- Live URL：https://printsizer.vercel.app
+- GitHub：https://github.com/owen1004/printsizer
+- 最終 commit：131117a
+- Checkpoint 檔案：~/.gstack/projects/owen1004-SuperDevFramework/checkpoints/20260505-164218-printsizer-v1-complete.md
+- Pending：og-image.png 尚未導出（OG 社群預覽）
+```
+
+---
+
+### [2026-05-05] Sprint 4 — 部署 + GSAP 動畫 + 品質邏輯修正 + 視覺升級
+
+```
+- 角色：14_Frontend_Engineer + 06_DevOps_Release
+- 內容：
+  1. 部署至 GitHub (owen1004/printsizer) + Vercel (printsizer.vercel.app)
+  2. 新增 SVG Favicon（album icon，橙色漸層），雙層方案（icon.svg + public/favicon.svg + <link> tag）
+  3. Header logo 從 emoji 替換為 inline SVG（與 favicon 一致）
+  4. 圖片預覽從 96×96 縮圖升級為全寬 hero banner（h-52，floating quality badge）
+  5. GSAP 動畫：useGSAP hook，timeline 入場，彈性 meter dot
+  6. 品質評級邏輯修正：改為基於「可達 ≥150 DPI 的最大尺寸」，新增 'low' 第 5 tier，解決矛盾顯示
+  7. 長寬比顯示修正：niceRatio 算法（GCD + 有理數逼近，分母 ≤ 30），527:746 → 12:17
+  8. Bug fix：GSAP opacity=0 導致底部 CTA 消失，改用 CSS animate-fade-in-up
+- 關鍵 commits：
+  - 131117a fix: restore bottom CTA and reset button visibility
+  - 249ffcb feat: add GSAP animations + fix aspect ratio display
+  - 05f45ae fix: rebase quality rating on achievable print size
+  - a36bf1c feat: upgrade image preview to full-width hero
+  - fe22c27 fix: favicon reliability
+- 符合 CONSTITUTION：第 4 條（瀏覽器端），第 5 條（圖片不上傳）
+- 技術債：og-image.png 未導出（🟢 輕微，不影響功能）
+```
+
+---
 
 ### [2026-05-05] Bug Fix — N2 AspectRatioCalculator 同步問題
 
