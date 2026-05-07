@@ -91,21 +91,29 @@ function getQuality(printSizes: PrintSize[]): ImageInfo['quality'] {
 
   const largest = goodSizes[goodSizes.length - 1] // 陣列已從小排到大
 
-  const bigFormats    = ['A3 海報', 'A2 海報', 'A1 海報', '易拉展']
-  const mediumFormats = ['A4 傳單']
-  const smallFormats  = ['A5 傳單', 'A6 明信片', 'DM 卡片']
+  // 對齊業界印刷實務：A4 傳單為一般使用門檻
+  // - excellent：A3 以上海報水準
+  // - good：A4 傳單水準
+  // - fair：A5 小傳單水準
+  // - low：只能印明信片/名片等小型印品
+  // - poor：連名片都達不到 150 DPI
+  const bigFormats   = ['A3 海報', 'A2 海報', 'A1 海報', '易拉展']
+  const mediumFormat = 'A4 傳單'
+  const fairFormat   = 'A5 傳單'
+  const lowFormats   = ['A6 明信片', 'DM 卡片', '名片']
 
-  if (bigFormats.includes(largest.name))    return 'excellent'
-  if (mediumFormats.includes(largest.name)) return 'good'
-  if (smallFormats.includes(largest.name))  return 'fair'
-  return 'low' // 只有名片等級
+  if (bigFormats.includes(largest.name)) return 'excellent'
+  if (largest.name === mediumFormat)     return 'good'
+  if (largest.name === fairFormat)       return 'fair'
+  if (lowFormats.includes(largest.name)) return 'low'
+  return 'poor'
 }
 
 const QUALITY_LABELS: Record<ImageInfo['quality'], string> = {
-  excellent: '優秀 — 可印大型海報',
+  excellent: '優秀 — 可印大型海報（A3 以上）',
   good:      '良好 — 可印 A4 傳單',
-  fair:      '尚可 — 適合 A5 以下',
-  low:       '偏低 — 適合名片・小型印品',
+  fair:      '尚可 — 適合 A5 小傳單',
+  low:       '偏低 — 僅適合明信片・名片',
   poor:      '不足 — 建議換更高畫質圖片',
 }
 
