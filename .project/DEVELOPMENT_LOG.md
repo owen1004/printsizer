@@ -40,6 +40,21 @@
 
 ## 📋 開發記錄（最新在上）
 
+### [2026-05-08] Feature — 安裝 Vercel Speed Insights
+
+```
+- 角色：06_DevOps_Release
+- 內容：
+  - npm install @vercel/speed-insights（^2.0.0）
+  - layout.tsx import { SpeedInsights } from '@vercel/speed-insights/next'
+  - <SpeedInsights /> 加在 <Analytics /> 後面
+- 功能：採集 Core Web Vitals（LCP/CLS/INP/FCP/TTFB）至 Vercel dashboard
+- 部署後第一次有用戶訪問即開始累積資料
+- 技術債：無新增
+```
+
+---
+
 ### [2026-05-08] Feature — 安裝 Vercel Web Analytics
 
 ```
