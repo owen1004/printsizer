@@ -56,16 +56,19 @@ const PRINT_SIZES: { name: string; desc: string; w: number; h: number; minDpi: n
 ]
 
 // DPI → 印刷品質等級
-// 兩段邏輯避免「優秀直接掉到不建議」的視覺斷層：
-//   未達 minDpi 但 ≥ 0.6×minDpi → 可接受（警示，仍 canPrint=false 淡化）
+// 設計目標：5 個 tier 都要在大多數圖片中可見，避免「優秀直接跳勉強」斷層
+//   未達 minDpi 但 ≥ 0.6×minDpi → 勉強（警示，仍 canPrint=false 淡化）
 //   <  0.6×minDpi               → 不建議（明顯不足）
-//   ≥  minDpi                   → 沿用絕對 DPI 分級（保留既有用戶直覺）
+//   ≥  minDpi 以上按絕對 DPI 對齊印刷專業標準：
+//     ≥ 300 → 極致（press-perfect 印刷頂規）
+//     ≥ 200 → 優秀（高品質印刷標準）
+//     其他  → 良好（達 minDpi 但 <200，用作優秀與勉強之間的過渡）
 function dpiToPrintQuality(dpi: number, minDpi: number): PrintSize['printQuality'] {
   if (dpi < minDpi * 0.6) return 'poor'
   if (dpi < minDpi)       return 'acceptable'
   if (dpi >= 300) return 'excellent'
-  if (dpi >= 150) return 'good'
-  return 'fair'  // 介於 minDpi 與 150 之間
+  if (dpi >= 200) return 'good'
+  return 'fair'  // 介於 minDpi 與 200 之間（過渡層）
 }
 
 function gcd(a: number, b: number): number {
