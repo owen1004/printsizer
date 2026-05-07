@@ -279,7 +279,7 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
       {/* ── 各印刷尺寸品質一覽 ── */}
       <div className="bg-white rounded-3xl apple-shadow p-5">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">各印刷尺寸品質</p>
-        <p className="text-xs text-gray-500 mb-4">低於 72 DPI 不建議印製（視覺可見鋸齒）</p>
+        <p className="text-xs text-gray-500 mb-4">門檻按觀看距離分層（名片需 200 DPI、A4 需 150 DPI、易拉展遠看僅需 50 DPI）</p>
         <div className="space-y-1.5">
           {info.maxPrintSizes.map((size) => {
             const q = PRINT_QUALITY[size.printQuality]

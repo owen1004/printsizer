@@ -40,6 +40,32 @@
 
 ## 📋 開發記錄（最新在上）
 
+### [2026-05-05] Bug Fix — 印刷可行性判定改為按尺寸觀看距離分層
+
+```
+- 角色：02_Developer + 03_Architect
+- 符合 CONSTITUTION：第 1 條（核心價值「減少印壞重印的浪費與糾紛」）+ 第 4 條（DPI 計算、品質評級）
+- 觸發：用戶實測 736×1087 圖片，PrintSizer 評為「尚可」但 posterprintshop 評為 Poor，存在高估風險
+- Root Cause：
+  - canPrint 統一用 dpi >= 72 作為門檻，忽略觀看距離差異
+  - 結果：名片 89 DPI 跟易拉展 89 DPI 都被標為「可印」，但實際印刷品質天差地遠
+  - 整體評級 getQuality() 寫死 ≥150 DPI 為高品質，與 canPrint 雙重標準
+- Fix：
+  - PRINT_SIZES 加 minDpi 欄，按印刷實務觀看距離分層
+    名片/DM/A6 = 200, A5/A4 = 150, A3 = 120, A2 = 100, A1 = 75, 易拉展 = 50
+  - canPrint 改為 dpi >= size.minDpi
+  - getQuality 改為以 canPrint 為基準，避免雙重標準
+  - ResultPanel 提示文字同步更新（「門檻按觀看距離分層」）
+- 驗證（用戶測試圖 736×1087）：
+  - 舊：整體「尚可」，A4 標可印；新：整體「偏低」，僅名片可印
+  - 對齊 posterprintshop 的 Poor 評級
+- Pre-fix baseline commit：883277c
+- Fix commit：見下次 push
+- 技術債：無新增
+```
+
+---
+
 ### [2026-05-05] /checkpoint — PrintSizer v1.0 專案完成存檔
 
 ```

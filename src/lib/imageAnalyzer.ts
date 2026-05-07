@@ -21,7 +21,7 @@ export interface PrintSize {
   height: number  // cm
   dpi: number     // 此圖在此尺寸實際可達 DPI
   printQuality: 'excellent' | 'good' | 'fair' | 'acceptable' | 'poor'
-  canPrint: boolean  // dpi >= 72（與 DPI 表格「可接受品質」一致）
+  canPrint: boolean  // dpi >= 該尺寸 minDpi（印刷實務門檻，按觀看距離分層）
 }
 
 export interface DpiLevel {
@@ -33,16 +33,21 @@ export interface DpiLevel {
 }
 
 // 台灣常見印刷品尺寸（由小到大）
-const PRINT_SIZES: { name: string; desc: string; w: number; h: number }[] = [
-  { name: '名片',     desc: '標準名片',         w:  9,    h:  5.4  },
-  { name: 'DM 卡片',  desc: '促銷卡・小型 DM',  w: 10,    h: 15    },
-  { name: 'A6 明信片',desc: '明信片・小傳單',   w: 10.5,  h: 14.8  },
-  { name: 'A5 傳單',  desc: '對折傳單・小海報', w: 14.8,  h: 21    },
-  { name: 'A4 傳單',  desc: '最常見傳單尺寸',   w: 21,    h: 29.7  },
-  { name: 'A3 海報',  desc: '店面張貼・宣傳海報',w: 29.7, h: 42    },
-  { name: 'A2 海報',  desc: '展覽海報・活動宣傳',w: 42,   h: 59.4  },
-  { name: 'A1 海報',  desc: '大型活動・展場廣告',w: 59.4, h: 84.1  },
-  { name: '易拉展',   desc: 'X 架・展場立牌',   w: 80,    h: 200   },
+// minDpi：印刷廠老闆視角的「實務可印門檻」，按觀看距離調整
+//   - 名片/DM/明信片：手持 30cm 內近看，需 200 DPI
+//   - A5/A4 傳單：閱讀距離 50cm，需 150 DPI
+//   - A3 海報：店面 1m 距離，120 DPI
+//   - A2/A1 海報/易拉展：2m 以上遠距，門檻可大幅放寬
+const PRINT_SIZES: { name: string; desc: string; w: number; h: number; minDpi: number }[] = [
+  { name: '名片',     desc: '標準名片',         w:  9,    h:  5.4,  minDpi: 200 },
+  { name: 'DM 卡片',  desc: '促銷卡・小型 DM',  w: 10,    h: 15,    minDpi: 200 },
+  { name: 'A6 明信片',desc: '明信片・小傳單',   w: 10.5,  h: 14.8,  minDpi: 200 },
+  { name: 'A5 傳單',  desc: '對折傳單・小海報', w: 14.8,  h: 21,    minDpi: 150 },
+  { name: 'A4 傳單',  desc: '最常見傳單尺寸',   w: 21,    h: 29.7,  minDpi: 150 },
+  { name: 'A3 海報',  desc: '店面張貼・宣傳海報',w: 29.7, h: 42,    minDpi: 120 },
+  { name: 'A2 海報',  desc: '展覽海報・活動宣傳',w: 42,   h: 59.4,  minDpi: 100 },
+  { name: 'A1 海報',  desc: '大型活動・展場廣告',w: 59.4, h: 84.1,  minDpi:  75 },
+  { name: '易拉展',   desc: 'X 架・展場立牌',   w: 80,    h: 200,   minDpi:  50 },
 ]
 
 // DPI → 印刷品質等級（與 DPI 對照表一致）
@@ -81,15 +86,14 @@ function niceRatio(w: number, h: number): { w: number; h: number } {
 }
 
 /**
- * 根據「≥150 DPI 能達到的最大印刷尺寸」決定整體評級，
- * 避免「整體不足但名片品質優秀」的矛盾顯示。
+ * 根據「實務上可印（canPrint=true）的最大尺寸」決定整體評級。
+ * canPrint 已經是按尺寸觀看距離的實務門檻，這裡直接沿用，避免雙重標準。
  */
 function getQuality(printSizes: PrintSize[]): ImageInfo['quality'] {
-  // ≥150 DPI 才算「高品質」
-  const goodSizes = printSizes.filter((s) => s.dpi >= 150)
-  if (goodSizes.length === 0) return 'poor'
+  const printable = printSizes.filter((s) => s.canPrint)
+  if (printable.length === 0) return 'poor'
 
-  const largest = goodSizes[goodSizes.length - 1] // 陣列已從小排到大
+  const largest = printable[printable.length - 1] // 陣列已從小排到大
 
   // 對齊業界印刷實務：A4 傳單為一般使用門檻
   // - excellent：A3 以上海報水準
@@ -138,7 +142,7 @@ function calcPrintSizes(pixelWidth: number, pixelHeight: number): PrintSize[] {
       height: size.h,
       dpi,
       printQuality: dpiToPrintQuality(dpi),
-      canPrint: dpi >= 72,   // 與 DPI 表格「可接受品質」門檻統一
+      canPrint: dpi >= size.minDpi,   // 印刷實務門檻（按觀看距離分層）
     }
   })
 }
