@@ -414,32 +414,34 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
         </div>
       )}
 
-      {/* ── DPI 等級對照表 ── */}
-      <div className="bg-white rounded-3xl apple-shadow p-5">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">各品質等級最大可印尺寸</p>
-        <p className="text-xs text-gray-500 mb-4">保持原始比例，DPI 越低 → 可印越大但需越遠距離觀看</p>
-        <div className="space-y-2">
-          {info.dpiLevels.map((lvl) => {
-            const s = DPI_ROW[lvl.label]
-            return (
-              <div key={lvl.dpi} className={`gs-dpi-row flex items-center rounded-xl px-4 py-3 ${s.bg}`}>
-                <div className="w-14 flex-shrink-0">
-                  <span className={`text-xl font-black ${s.text}`}>{lvl.dpi}</span>
-                  <span className={`text-xs ml-1 ${s.text} opacity-60`}>DPI</span>
-                </div>
-                <div className="flex-1 text-center">
-                  <span className={`text-sm font-semibold ${s.text}`}>
-                    {lvl.widthCm} × {lvl.heightCm} cm
+      {/* ── DPI 等級對照表（不足狀態下隱藏，避免跟主評級訊號矛盾）── */}
+      {!noPrintable && (
+        <div className="bg-white rounded-3xl apple-shadow p-5">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">各品質等級最大可印尺寸</p>
+          <p className="text-xs text-gray-500 mb-4">保持原始比例，DPI 越低 → 可印越大但需越遠距離觀看</p>
+          <div className="space-y-2">
+            {info.dpiLevels.map((lvl) => {
+              const s = DPI_ROW[lvl.label]
+              return (
+                <div key={lvl.dpi} className={`gs-dpi-row flex items-center rounded-xl px-4 py-3 ${s.bg}`}>
+                  <div className="w-14 flex-shrink-0">
+                    <span className={`text-xl font-black ${s.text}`}>{lvl.dpi}</span>
+                    <span className={`text-xs ml-1 ${s.text} opacity-60`}>DPI</span>
+                  </div>
+                  <div className="flex-1 text-center">
+                    <span className={`text-sm font-semibold ${s.text}`}>
+                      {lvl.widthCm} × {lvl.heightCm} cm
+                    </span>
+                  </div>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${s.badge}`}>
+                    {lvl.labelText}
                   </span>
                 </div>
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${s.badge}`}>
-                  {lvl.labelText}
-                </span>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── 各印刷尺寸品質一覽 ── */}
       <div className="bg-white rounded-3xl apple-shadow p-5">
