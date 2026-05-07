@@ -40,6 +40,26 @@
 
 ## 📋 開發記錄（最新在上）
 
+### [2026-05-08] Feature — 安裝 Vercel Web Analytics
+
+```
+- 角色：06_DevOps_Release
+- 觸發：用戶反映 Vercel Analytics dashboard 無資料
+- Root Cause：Vercel agent 之前回報「已完成安裝」是假象——
+  它只在自己沙盒跑過 build 驗證，但變更從未 commit/push 到 master
+  package.json 沒有 @vercel/analytics、layout.tsx 沒有 Analytics import
+- Fix（實際動手）：
+  1. npm install @vercel/analytics（^2.0.1）
+  2. layout.tsx import { Analytics } from '@vercel/analytics/next'
+  3. 在 <body> 末尾加 <Analytics />
+  4. TS pass，commit + push
+- 不採用 Vercel agent 提的 ESLint flat config（過度設計，與既有 Next.js 預設不衝突）
+- 部署後 5-10 分鐘開始累積資料；第一筆 pageview 觸發後可從 Vercel dashboard 看到
+- 技術債：無新增
+```
+
+---
+
 ### [2026-05-08] Bug Fix — printQuality 階梯「良好」死區（minDpi ≥ 150 永遠跳過良好）
 
 ```
