@@ -149,11 +149,14 @@ function calcPrintSizes(pixelWidth: number, pixelHeight: number): PrintSize[] {
 
 function calcDpiLevels(pixelWidth: number, pixelHeight: number): DpiLevel[] {
   const CM_TO_INCH = 0.3937
+  // 標籤改為觀看距離導向，跟 PRINT_SIZES 的 minDpi 邏輯對齊：
+  //   300 = 極致（任何尺寸近看）／ 150 = 傳單水準（A4 門檻）
+  //   100 = 海報水準（A2/A3 中距）／ 75 = 遠距水準（A1/易拉展）
   const levels = [
     { dpi: 300, label: 'extreme',    labelText: '極致品質' },
-    { dpi: 150, label: 'excellent',  labelText: '優秀品質' },
-    { dpi: 100, label: 'good',       labelText: '良好品質' },
-    { dpi:  72, label: 'acceptable', labelText: '可接受品質' },
+    { dpi: 150, label: 'excellent',  labelText: '傳單品質' },
+    { dpi: 100, label: 'good',       labelText: '海報品質' },
+    { dpi:  75, label: 'acceptable', labelText: '遠距品質' },
   ]
   return levels.map(({ dpi, label, labelText }) => ({
     dpi,

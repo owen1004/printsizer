@@ -252,7 +252,7 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
       {/* ── DPI 等級對照表 ── */}
       <div className="bg-white rounded-3xl apple-shadow p-5">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">各品質等級最大可印尺寸</p>
-        <p className="text-xs text-gray-500 mb-4">保持原始比例，在不同 DPI 品質下的最大輸出尺寸</p>
+        <p className="text-xs text-gray-500 mb-4">保持原始比例，DPI 越低 → 可印越大但需越遠距離觀看</p>
         <div className="space-y-2">
           {info.dpiLevels.map((lvl) => {
             const s = DPI_ROW[lvl.label]
