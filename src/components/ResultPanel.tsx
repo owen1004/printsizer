@@ -361,8 +361,8 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
               <li className="flex gap-2.5">
                 <span className="w-5 h-5 rounded-full bg-orange-100 text-orange-700 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
                 <div>
-                  <p className="font-semibold text-gray-900">AI 放大工具</p>
-                  <p className="text-xs text-gray-500 mt-0.5">推薦 upscayl / waifu2x / Topaz Photo AI（細節有極限）</p>
+                  <p className="font-semibold text-gray-900">AI 放大工具（細節有極限）</p>
+                  <p className="text-xs text-gray-500 mt-0.5">坊間有免費軟體可試做初步處理。複雜或商業用途，建議交給專業印刷廠處理。</p>
                 </div>
               </li>
             </ol>
@@ -449,7 +449,11 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
         <p className="text-xs text-gray-500 mb-4">門檻按觀看距離分層（名片需 200 DPI、A4 需 150 DPI、易拉展遠看僅需 50 DPI）</p>
         <div className="space-y-1.5">
           {info.maxPrintSizes.map((size) => {
-            const q = PRINT_QUALITY[size.printQuality]
+            // 全圖無可印時，把「可接受」緩衝層也壓成「不建議」，
+            // 避免跟主訊息「無法印任何標準尺寸」打架
+            const effectiveQuality =
+              noPrintable && size.printQuality === 'acceptable' ? 'poor' : size.printQuality
+            const q = PRINT_QUALITY[effectiveQuality]
             return (
               <div
                 key={size.name}
