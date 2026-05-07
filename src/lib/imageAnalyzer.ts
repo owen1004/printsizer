@@ -10,7 +10,6 @@ export interface ImageInfo {
   quality: 'excellent' | 'good' | 'fair' | 'low' | 'poor'
   qualityLabel: string
   maxPrintSizes: PrintSize[]
-  dpiLevels: DpiLevel[]
   aspectRatio: { w: number; h: number }
 }
 
@@ -23,14 +22,6 @@ export interface PrintSize {
   minDpi: number  // 該尺寸的印刷實務門檻（按觀看距離）
   printQuality: 'excellent' | 'good' | 'fair' | 'acceptable' | 'poor'
   canPrint: boolean  // dpi >= 該尺寸 minDpi
-}
-
-export interface DpiLevel {
-  dpi: number
-  widthCm: number
-  heightCm: number
-  label: string
-  labelText: string
 }
 
 // 台灣常見印刷品尺寸（由小到大）
@@ -168,26 +159,6 @@ function calcPrintSizes(pixelWidth: number, pixelHeight: number): PrintSize[] {
   })
 }
 
-function calcDpiLevels(pixelWidth: number, pixelHeight: number): DpiLevel[] {
-  const CM_TO_INCH = 0.3937
-  // 標籤改為觀看距離導向，跟 PRINT_SIZES 的 minDpi 邏輯對齊：
-  //   300 = 極致（任何尺寸近看）／ 150 = 傳單水準（A4 門檻）
-  //   100 = 海報水準（A2/A3 中距）／ 75 = 遠距水準（A1/易拉展）
-  const levels = [
-    { dpi: 300, label: 'extreme',    labelText: '極致品質' },
-    { dpi: 150, label: 'excellent',  labelText: '傳單品質' },
-    { dpi: 100, label: 'good',       labelText: '海報品質' },
-    { dpi:  75, label: 'acceptable', labelText: '遠距品質' },
-  ]
-  return levels.map(({ dpi, label, labelText }) => ({
-    dpi,
-    widthCm:  Math.round((pixelWidth  / dpi / CM_TO_INCH) * 10) / 10,
-    heightCm: Math.round((pixelHeight / dpi / CM_TO_INCH) * 10) / 10,
-    label,
-    labelText,
-  }))
-}
-
 export async function analyzeImage(file: File): Promise<ImageInfo> {
   let blob: Blob = file
 
@@ -229,7 +200,6 @@ export async function analyzeImage(file: File): Promise<ImageInfo> {
     quality,
     qualityLabel:  buildQualityLabel(quality, largestPrintable),
     maxPrintSizes,
-    dpiLevels:     calcDpiLevels(width, height),
     aspectRatio:   niceRatio(width, height),
   }
 }

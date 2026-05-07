@@ -42,13 +42,6 @@ const PRINT_QUALITY: Record<PrintSize['printQuality'], {
   poor:       { dot: 'bg-gray-300',   label: '不建議', textColor: 'text-gray-500'  },
 }
 
-const DPI_ROW: Record<string, { bg: string; text: string; badge: string }> = {
-  extreme:    { bg: 'bg-green-50',  text: 'text-green-700',  badge: 'bg-green-100 text-green-700'  },
-  excellent:  { bg: 'bg-blue-50',   text: 'text-blue-700',   badge: 'bg-blue-100 text-blue-700'    },
-  good:       { bg: 'bg-amber-50',  text: 'text-amber-700',  badge: 'bg-amber-100 text-amber-700'  },
-  acceptable: { bg: 'bg-gray-50',   text: 'text-gray-600',   badge: 'bg-gray-100 text-gray-600'    },
-}
-
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
@@ -127,10 +120,7 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
     // 6. CTA 卡
     tl.from('.gs-cta', { y: 16, opacity: 0, duration: 0.4 }, '-=0.15')
 
-    // 7. DPI 等級列錯開
-    tl.from('.gs-dpi-row', { x: -14, opacity: 0, duration: 0.3, stagger: 0.06 }, '-=0.2')
-
-    // 8. 各印刷品列錯開
+    // 7. 各印刷品列錯開
     tl.from('.gs-size-row', { x: -10, opacity: 0, duration: 0.25, stagger: 0.04 }, '-=0.15')
 
   }, { scope: containerRef })
@@ -414,32 +404,6 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
         </div>
       )}
 
-      {/* ── DPI 等級對照表 ── */}
-      <div className="bg-white rounded-3xl apple-shadow p-5">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">各品質等級最大可印尺寸</p>
-        <p className="text-xs text-gray-500 mb-4">保持原始比例，DPI 越低 → 可印越大但需越遠距離觀看</p>
-        <div className="space-y-2">
-          {info.dpiLevels.map((lvl) => {
-            const s = DPI_ROW[lvl.label]
-            return (
-              <div key={lvl.dpi} className={`gs-dpi-row flex items-center rounded-xl px-4 py-3 ${s.bg}`}>
-                <div className="w-14 flex-shrink-0">
-                  <span className={`text-xl font-black ${s.text}`}>{lvl.dpi}</span>
-                  <span className={`text-xs ml-1 ${s.text} opacity-60`}>DPI</span>
-                </div>
-                <div className="flex-1 text-center">
-                  <span className={`text-sm font-semibold ${s.text}`}>
-                    {lvl.widthCm} × {lvl.heightCm} cm
-                  </span>
-                </div>
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${s.badge}`}>
-                  {lvl.labelText}
-                </span>
-              </div>
-            )
-          })}
-        </div>
-      </div>
 
       {/* ── 各印刷尺寸品質一覽 ── */}
       <div className="bg-white rounded-3xl apple-shadow p-5">

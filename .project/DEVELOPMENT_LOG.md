@@ -40,6 +40,26 @@
 
 ## 📋 開發記錄（最新在上）
 
+### [2026-05-08] Refactor — 刪除「各品質等級最大可印尺寸」表（方案 B）
+
+```
+- 角色：09_Senior_PM + 02_Developer
+- 觸發：「不足」狀態下 DPI 階梯表跟主要評級訊號互相打架
+  例：上方說「無法印任何標準尺寸」，中間表卻顯示「150 DPI 傳單品質 10.2×6.8 cm」
+- 決策：直接刪除整張 DPI 階梯表
+- 理由：
+  1. 資訊冗餘：「各印刷尺寸品質」已涵蓋所有實務需求
+  2. 維護痛點：每次改 DPI 邏輯都要同步兩張表（前面三次修都遇到）
+  3. 核心用戶（CONSTITUTION 第 2 條：印刷廠客戶）不需要反向查詢「150 DPI 能印多大」
+  4. 頁面變短，下拉更快看到 CTA / 解決方案
+- 刪除範圍：
+  - imageAnalyzer.ts：DpiLevel interface、calcDpiLevels 函式、ImageInfo.dpiLevels 欄位
+  - ResultPanel.tsx：DPI 等級對照表 JSX、DPI_ROW 顏色 map、gs-dpi-row GSAP 動畫
+- 技術債：無新增（清掉一個維護負擔）
+```
+
+---
+
 ### [2026-05-08] Bug Fix — 印刷尺寸品質階梯「優秀直接掉不建議」斷層
 
 ```
