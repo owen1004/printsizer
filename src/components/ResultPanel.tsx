@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import Image from 'next/image'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
@@ -73,6 +73,7 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
 
   const containerRef = useRef<HTMLDivElement>(null)
   const dotRef       = useRef<HTMLDivElement>(null)
+  const [showStandardInfo, setShowStandardInfo] = useState(false)
 
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
@@ -143,7 +144,18 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
         <div className="gs-info px-5 pt-4 pb-5">
           {!previewUrl && (
             <div className="flex justify-between items-start mb-1">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">解析度評級</p>
+              <button
+                type="button"
+                onClick={() => setShowStandardInfo((v) => !v)}
+                className="flex items-center gap-1 text-xs font-semibold text-gray-500 uppercase tracking-widest hover:text-gray-700 transition-colors"
+                aria-expanded={showStandardInfo}
+              >
+                解析度評級
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <circle cx="12" cy="12" r="10" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4M12 8h.01" />
+                </svg>
+              </button>
               <span className="text-2xl font-black" style={{
                 background: cfg.gradient,
                 WebkitBackgroundClip: 'text',
@@ -153,7 +165,18 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
             </div>
           )}
           {previewUrl && (
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">解析度評級</p>
+            <button
+              type="button"
+              onClick={() => setShowStandardInfo((v) => !v)}
+              className="flex items-center gap-1 text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1 hover:text-gray-700 transition-colors"
+              aria-expanded={showStandardInfo}
+            >
+              解析度評級
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <circle cx="12" cy="12" r="10" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4M12 8h.01" />
+              </svg>
+            </button>
           )}
           <p className="text-xl font-bold tracking-tight text-gray-900">{info.qualityLabel}</p>
           <p className="text-xs text-gray-500 mt-1">
@@ -161,6 +184,27 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
             &ensp;·&ensp;{formatFileSize(info.fileSize)}
             &ensp;·&ensp;{info.aspectRatio.w}:{info.aspectRatio.h}
           </p>
+
+          {/* 評級標準說明（可展開） */}
+          {showStandardInfo && (
+            <div className="mt-3 bg-gray-50 border border-gray-200 rounded-2xl p-4 text-xs leading-relaxed text-gray-600">
+              <p className="font-semibold text-gray-800 mb-1.5">為什麼有些網站給出不一樣的結果？</p>
+              <p className="mb-2">
+                PrintSizer 按「<strong className="text-gray-800">實際觀看距離</strong>」判斷品質，
+                因為印刷品的清晰度需求隨用途而變：
+              </p>
+              <ul className="space-y-1 mb-2">
+                <li>· 名片拿手上 30cm 看，需 <strong>200 DPI</strong> 才不糊字</li>
+                <li>· A4 傳單閱讀距離 50cm，<strong>150 DPI</strong> 達標</li>
+                <li>· A3 海報店面 1m 距離，<strong>120 DPI</strong> 即可</li>
+                <li>· 易拉展 3m 外遠看，<strong>50 DPI</strong> 也無妨</li>
+              </ul>
+              <p>
+                其他工具多用單一門檻（如 75 或 150 DPI 一刀切），
+                會把可印的大圖誤判為不行，或把不該印的小圖誤判為可以。
+              </p>
+            </div>
+          )}
 
           {/* 品質計量條 */}
           <div className="mt-3">
