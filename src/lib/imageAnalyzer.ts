@@ -52,14 +52,16 @@ const PRINT_SIZES: { name: string; desc: string; w: number; h: number; minDpi: n
 ]
 
 // DPI → 印刷品質等級
-// 必須先通過該尺寸的 minDpi 門檻，否則一律「不建議」，避免標籤跟 canPrint 互相打架
+// 兩段邏輯避免「優秀直接掉到不建議」的視覺斷層：
+//   未達 minDpi 但 ≥ 0.6×minDpi → 可接受（警示，仍 canPrint=false 淡化）
+//   <  0.6×minDpi               → 不建議（明顯不足）
+//   ≥  minDpi                   → 沿用絕對 DPI 分級（保留既有用戶直覺）
 function dpiToPrintQuality(dpi: number, minDpi: number): PrintSize['printQuality'] {
-  if (dpi < minDpi) return 'poor'
+  if (dpi < minDpi * 0.6) return 'poor'
+  if (dpi < minDpi)       return 'acceptable'
   if (dpi >= 300) return 'excellent'
   if (dpi >= 150) return 'good'
-  if (dpi >= 100) return 'fair'
-  if (dpi >= 72)  return 'acceptable'
-  return 'poor'
+  return 'fair'  // 介於 minDpi 與 150 之間
 }
 
 function gcd(a: number, b: number): number {
