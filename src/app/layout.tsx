@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 const jakarta = Plus_Jakarta_Sans({
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${jakarta.className} bg-[#f5f5f7] min-h-screen`}>
         {children}
+        <Analytics />
       </body>
     </html>
   )
