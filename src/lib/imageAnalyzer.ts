@@ -50,8 +50,10 @@ const PRINT_SIZES: { name: string; desc: string; w: number; h: number; minDpi: n
   { name: '易拉展',   desc: 'X 架・展場立牌',   w: 80,    h: 200,   minDpi:  50 },
 ]
 
-// DPI → 印刷品質等級（與 DPI 對照表一致）
-function dpiToPrintQuality(dpi: number): PrintSize['printQuality'] {
+// DPI → 印刷品質等級
+// 必須先通過該尺寸的 minDpi 門檻，否則一律「不建議」，避免標籤跟 canPrint 互相打架
+function dpiToPrintQuality(dpi: number, minDpi: number): PrintSize['printQuality'] {
+  if (dpi < minDpi) return 'poor'
   if (dpi >= 300) return 'excellent'
   if (dpi >= 150) return 'good'
   if (dpi >= 100) return 'fair'
@@ -141,7 +143,7 @@ function calcPrintSizes(pixelWidth: number, pixelHeight: number): PrintSize[] {
       width: size.w,
       height: size.h,
       dpi,
-      printQuality: dpiToPrintQuality(dpi),
+      printQuality: dpiToPrintQuality(dpi, size.minDpi),
       canPrint: dpi >= size.minDpi,   // 印刷實務門檻（按觀看距離分層）
     }
   })

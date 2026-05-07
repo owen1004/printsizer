@@ -40,6 +40,25 @@
 
 ## 📋 開發記錄（最新在上）
 
+### [2026-05-05] Bug Fix — printQuality 標籤跟 canPrint 互打架
+
+```
+- 角色：02_Developer
+- 觸發：用戶截圖顯示 A4 120 DPI 行已淡化但標籤仍寫「良好」、A3 85 DPI 寫「可接受」
+- Root Cause：
+  - dpiToPrintQuality() 還在用舊的絕對 DPI 階梯（≥150=good / ≥100=fair / ≥72=acceptable）
+  - canPrint 已改用 size.minDpi
+  - 兩條判斷各跑各的 → 視覺淡化（不可印）但標籤仍顯示正面評價
+- Fix：dpiToPrintQuality 加 minDpi 參數，dpi < minDpi 時直接判 'poor'（不建議）
+- 驗證範例：
+  - A4 minDpi=150 dpi=120：120<150 → poor 不建議 ✓（原本誤標 良好）
+  - A3 minDpi=120 dpi=85：85<120 → poor 不建議 ✓（原本誤標 可接受）
+  - 達標尺寸（名片極致 / DM 優秀 / A6 優秀 / A5 優秀）標籤完全不變
+- 技術債：無新增
+```
+
+---
+
 ### [2026-05-05] Polish — DPI 等級對照表標籤同步新邏輯
 
 ```
