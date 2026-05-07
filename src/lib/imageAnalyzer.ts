@@ -35,20 +35,24 @@ export interface DpiLevel {
 
 // 台灣常見印刷品尺寸（由小到大）
 // minDpi：印刷廠老闆視角的「實務可印門檻」，按觀看距離調整
-//   - 名片/DM/明信片：手持 30cm 內近看，需 200 DPI
+//   - 悠遊卡貼/名片/DM/明信片/A7：手持 30cm 內近看，需 200 DPI
 //   - A5/A4 傳單：閱讀距離 50cm，需 150 DPI
 //   - A3 海報：店面 1m 距離，120 DPI
-//   - A2/A1 海報/易拉展：2m 以上遠距，門檻可大幅放寬
+//   - A2/A1 海報：2m 以上遠距，100/75 DPI
+//   - A0/易拉展：3m 以上大型展示，50 DPI
 const PRINT_SIZES: { name: string; desc: string; w: number; h: number; minDpi: number }[] = [
-  { name: '名片',     desc: '標準名片',         w:  9,    h:  5.4,  minDpi: 200 },
-  { name: 'DM 卡片',  desc: '促銷卡・小型 DM',  w: 10,    h: 15,    minDpi: 200 },
-  { name: 'A6 明信片',desc: '明信片・小傳單',   w: 10.5,  h: 14.8,  minDpi: 200 },
-  { name: 'A5 傳單',  desc: '對折傳單・小海報', w: 14.8,  h: 21,    minDpi: 150 },
-  { name: 'A4 傳單',  desc: '最常見傳單尺寸',   w: 21,    h: 29.7,  minDpi: 150 },
-  { name: 'A3 海報',  desc: '店面張貼・宣傳海報',w: 29.7, h: 42,    minDpi: 120 },
-  { name: 'A2 海報',  desc: '展覽海報・活動宣傳',w: 42,   h: 59.4,  minDpi: 100 },
-  { name: 'A1 海報',  desc: '大型活動・展場廣告',w: 59.4, h: 84.1,  minDpi:  75 },
-  { name: '易拉展',   desc: 'X 架・展場立牌',   w: 80,    h: 200,   minDpi:  50 },
+  { name: '悠遊卡貼',  desc: '悠遊卡貼紙',         w:  8.5,  h:  5.4,   minDpi: 200 },
+  { name: '名片',      desc: '標準名片',           w:  9,    h:  5.4,   minDpi: 200 },
+  { name: 'A7 標籤',   desc: '產品標籤・遊戲卡牌', w:  7.4,  h: 10.5,   minDpi: 200 },
+  { name: 'DM 卡片',   desc: '促銷卡・小型 DM',    w: 10,    h: 15,     minDpi: 200 },
+  { name: 'A6 明信片', desc: '明信片・小傳單',     w: 10.5,  h: 14.8,   minDpi: 200 },
+  { name: 'A5 傳單',   desc: '書籍・小冊子・對折傳單',w: 14.8, h: 21,   minDpi: 150 },
+  { name: 'A4 傳單',   desc: '最常見傳單尺寸',     w: 21,    h: 29.7,   minDpi: 150 },
+  { name: 'A3 海報',   desc: '雙頁廣告・摺頁宣傳品',w: 29.7, h: 42,     minDpi: 120 },
+  { name: 'A2 海報',   desc: '中型海報・設計稿',   w: 42,    h: 59.4,   minDpi: 100 },
+  { name: 'A1 海報',   desc: '技術圖紙・展示看板', w: 59.4,  h: 84.1,   minDpi:  75 },
+  { name: 'A0 海報',   desc: '大型工程圖・展示海報',w: 84.1, h: 118.9,  minDpi:  60 },
+  { name: '易拉展',    desc: 'X 架・展場立牌',     w: 80,    h: 200,    minDpi:  50 },
 ]
 
 // DPI → 印刷品質等級
@@ -105,11 +109,11 @@ function getQuality(printSizes: PrintSize[]): ImageInfo['quality'] {
   // - good：A4 傳單水準
   // - fair：A5 小傳單水準
   // - low：只能印明信片/名片等小型印品
-  // - poor：連名片都達不到 150 DPI
-  const bigFormats   = ['A3 海報', 'A2 海報', 'A1 海報', '易拉展']
+  // - poor：連名片都達不到門檻
+  const bigFormats   = ['A3 海報', 'A2 海報', 'A1 海報', 'A0 海報', '易拉展']
   const mediumFormat = 'A4 傳單'
   const fairFormat   = 'A5 傳單'
-  const lowFormats   = ['A6 明信片', 'DM 卡片', '名片']
+  const lowFormats   = ['A6 明信片', 'A7 標籤', 'DM 卡片', '名片', '悠遊卡貼']
 
   if (bigFormats.includes(largest.name)) return 'excellent'
   if (largest.name === mediumFormat)     return 'good'
@@ -119,10 +123,11 @@ function getQuality(printSizes: PrintSize[]): ImageInfo['quality'] {
 }
 
 // 等級對應的中文形容詞（不含尺寸資訊）
+// 整圖評級用詞跟單尺寸層（極致/優秀/良好/勉強/不建議）刻意分流，避免「優秀」歧義
 const QUALITY_TIER: Record<ImageInfo['quality'], string> = {
-  excellent: '優秀',
-  good:      '良好',
-  fair:      '尚可',
+  excellent: '頂級',
+  good:      '高品質',
+  fair:      '中等',
   low:       '偏低',
   poor:      '不足',
 }
@@ -137,7 +142,6 @@ function buildQualityLabel(
 ): string {
   const tier = QUALITY_TIER[quality]
   if (quality === 'poor' || !largest) return `${tier} — 建議換更高畫質圖片`
-  if (largest.name === '名片')        return `${tier} — 僅適合名片`
   return `${tier} — 最高可印 ${largest.name}`
 }
 

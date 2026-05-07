@@ -17,11 +17,11 @@ interface Props {
 const OVERALL_CONFIG: Record<ImageInfo['quality'], {
   label: string; meterPct: number; gradient: string
 }> = {
-  excellent: { label: '優秀', meterPct: 93, gradient: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' },
-  good:      { label: '良好', meterPct: 72, gradient: 'linear-gradient(135deg, #3B82F6 0%, #6366F1 100%)' },
-  fair:      { label: '尚可', meterPct: 50, gradient: 'linear-gradient(135deg, #F59E0B 0%, #F97316 100%)' },
-  low:       { label: '偏低', meterPct: 28, gradient: 'linear-gradient(135deg, #F97316 0%, #EF4444 100%)' },
-  poor:      { label: '不足', meterPct: 8,  gradient: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)' },
+  excellent: { label: '頂級',   meterPct: 93, gradient: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' },
+  good:      { label: '高品質', meterPct: 72, gradient: 'linear-gradient(135deg, #3B82F6 0%, #6366F1 100%)' },
+  fair:      { label: '中等',   meterPct: 50, gradient: 'linear-gradient(135deg, #F59E0B 0%, #F97316 100%)' },
+  low:       { label: '偏低',   meterPct: 28, gradient: 'linear-gradient(135deg, #F97316 0%, #EF4444 100%)' },
+  poor:      { label: '不足',   meterPct: 8,  gradient: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)' },
 }
 
 const METER_DOT: Record<ImageInfo['quality'], string> = {
@@ -38,7 +38,7 @@ const PRINT_QUALITY: Record<PrintSize['printQuality'], {
   excellent:  { dot: 'bg-green-500',  label: '極致',   textColor: 'text-green-700' },
   good:       { dot: 'bg-blue-500',   label: '優秀',   textColor: 'text-blue-700'  },
   fair:       { dot: 'bg-amber-500',  label: '良好',   textColor: 'text-amber-700' },
-  acceptable: { dot: 'bg-orange-400', label: '可接受', textColor: 'text-orange-700'},
+  acceptable: { dot: 'bg-orange-400', label: '勉強',   textColor: 'text-orange-700'},
   poor:       { dot: 'bg-gray-300',   label: '不建議', textColor: 'text-gray-500'  },
 }
 
@@ -241,7 +241,7 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
               />
             </div>
             <div className="flex justify-between text-[10px] text-gray-500 mt-1 select-none">
-              <span>不足</span><span>優秀</span>
+              <span>不足</span><span>頂級</span>
             </div>
           </div>
         </div>
@@ -265,37 +265,44 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
             </div>
           </div>
         </div>
-      ) : (
+      ) : goodSize && bestSize && goodSize.name !== bestSize.name ? (
+        // best ≠ max：兩張卡片並排，提供不同維度的建議
         <div className="grid grid-cols-2 gap-3">
           <div className="gs-card bg-white rounded-2xl apple-shadow p-4">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">最佳建議</p>
-            {goodSize && (
-              <>
-                <p className="text-lg font-bold tracking-tight text-gray-900">{goodSize.name}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{goodSize.width} × {goodSize.height} cm</p>
-                <p className="text-xs text-gray-400 mt-1">{goodSize.desc}</p>
-                <span className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${PRINT_QUALITY[goodSize.printQuality].textColor} bg-gray-100`}>
-                  {PRINT_QUALITY[goodSize.printQuality].label} · {goodSize.dpi} DPI
-                </span>
-              </>
-            )}
+            <p className="text-lg font-bold tracking-tight text-gray-900">{goodSize.name}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{goodSize.width} × {goodSize.height} cm</p>
+            <p className="text-xs text-gray-400 mt-1">{goodSize.desc}</p>
+            <span className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${PRINT_QUALITY[goodSize.printQuality].textColor} bg-gray-100`}>
+              {PRINT_QUALITY[goodSize.printQuality].label} · {goodSize.dpi} DPI
+            </span>
           </div>
 
           <div className="gs-card bg-white rounded-2xl apple-shadow p-4">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">最大可印</p>
-            {bestSize && (
-              <>
-                <p className="text-lg font-bold tracking-tight text-gray-900">{bestSize.name}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{bestSize.width} × {bestSize.height} cm</p>
-                <p className="text-xs text-gray-400 mt-1">{bestSize.desc}</p>
-                <span className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${PRINT_QUALITY[bestSize.printQuality].textColor} bg-gray-100`}>
-                  {PRINT_QUALITY[bestSize.printQuality].label} · {bestSize.dpi} DPI
-                </span>
-              </>
-            )}
+            <p className="text-lg font-bold tracking-tight text-gray-900">{bestSize.name}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{bestSize.width} × {bestSize.height} cm</p>
+            <p className="text-xs text-gray-400 mt-1">{bestSize.desc}</p>
+            <span className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${PRINT_QUALITY[bestSize.printQuality].textColor} bg-gray-100`}>
+              {PRINT_QUALITY[bestSize.printQuality].label} · {bestSize.dpi} DPI
+            </span>
           </div>
         </div>
-      )}
+      ) : bestSize ? (
+        // best == max（單一最佳建議）：合併成一張全寬卡片，避免訊息冗餘
+        <div className="gs-card bg-white rounded-2xl apple-shadow p-4">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">建議印製尺寸</p>
+          <div className="flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-lg font-bold tracking-tight text-gray-900">{bestSize.name}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{bestSize.width} × {bestSize.height} cm　·　{bestSize.desc}</p>
+            </div>
+            <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${PRINT_QUALITY[bestSize.printQuality].textColor} bg-gray-100 flex-shrink-0`}>
+              {PRINT_QUALITY[bestSize.printQuality].label} · {bestSize.dpi} DPI
+            </span>
+          </div>
+        </div>
+      ) : null}
 
       {/* ── 印刷服務 CTA ／ 不足時改為解決方案卡片 ── */}
       {noPrintable ? (
