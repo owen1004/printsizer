@@ -115,12 +115,27 @@ function getQuality(printSizes: PrintSize[]): ImageInfo['quality'] {
   return 'poor'
 }
 
-const QUALITY_LABELS: Record<ImageInfo['quality'], string> = {
-  excellent: '優秀 — 可印大型海報（A3 以上）',
-  good:      '良好 — 可印 A4 傳單',
-  fair:      '尚可 — 適合 A5 小傳單',
-  low:       '偏低 — 僅適合明信片・名片',
-  poor:      '不足 — 建議換更高畫質圖片',
+// 等級對應的中文形容詞（不含尺寸資訊）
+const QUALITY_TIER: Record<ImageInfo['quality'], string> = {
+  excellent: '優秀',
+  good:      '良好',
+  fair:      '尚可',
+  low:       '偏低',
+  poor:      '不足',
+}
+
+/**
+ * 根據實際的「最高可印尺寸」動態組標籤，
+ * 避免「優秀 A3 以上」但實際只能印到 A3 的誤導。
+ */
+function buildQualityLabel(
+  quality: ImageInfo['quality'],
+  largest: PrintSize | undefined,
+): string {
+  const tier = QUALITY_TIER[quality]
+  if (quality === 'poor' || !largest) return `${tier} — 建議換更高畫質圖片`
+  if (largest.name === '名片')        return `${tier} — 僅適合名片`
+  return `${tier} — 最高可印 ${largest.name}`
 }
 
 function calcPrintSizes(pixelWidth: number, pixelHeight: number): PrintSize[] {
@@ -196,8 +211,10 @@ export async function analyzeImage(file: File): Promise<ImageInfo> {
   const height = img.naturalHeight
   if (width === 0 || height === 0) throw new Error('無法讀取圖片尺寸')
 
-  const maxPrintSizes = calcPrintSizes(width, height)
-  const quality       = getQuality(maxPrintSizes)
+  const maxPrintSizes    = calcPrintSizes(width, height)
+  const quality          = getQuality(maxPrintSizes)
+  const printable        = maxPrintSizes.filter((s) => s.canPrint)
+  const largestPrintable = printable[printable.length - 1] // 可能 undefined
 
   return {
     width,
@@ -206,7 +223,7 @@ export async function analyzeImage(file: File): Promise<ImageInfo> {
     fileName:      file.name,
     fileType:      file.type || 'image/heic',
     quality,
-    qualityLabel:  QUALITY_LABELS[quality],
+    qualityLabel:  buildQualityLabel(quality, largestPrintable),
     maxPrintSizes,
     dpiLevels:     calcDpiLevels(width, height),
     aspectRatio:   niceRatio(width, height),
