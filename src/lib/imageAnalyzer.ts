@@ -20,8 +20,9 @@ export interface PrintSize {
   width: number   // cm
   height: number  // cm
   dpi: number     // 此圖在此尺寸實際可達 DPI
+  minDpi: number  // 該尺寸的印刷實務門檻（按觀看距離）
   printQuality: 'excellent' | 'good' | 'fair' | 'acceptable' | 'poor'
-  canPrint: boolean  // dpi >= 該尺寸 minDpi（印刷實務門檻，按觀看距離分層）
+  canPrint: boolean  // dpi >= 該尺寸 minDpi
 }
 
 export interface DpiLevel {
@@ -158,6 +159,7 @@ function calcPrintSizes(pixelWidth: number, pixelHeight: number): PrintSize[] {
       width: size.w,
       height: size.h,
       dpi,
+      minDpi: size.minDpi,
       printQuality: dpiToPrintQuality(dpi, size.minDpi),
       canPrint: dpi >= size.minDpi,   // 印刷實務門檻（按觀看距離分層）
     }
