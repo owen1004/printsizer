@@ -141,15 +141,24 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
       {/* ── 評分卡 ── */}
       <div className="bg-white rounded-3xl apple-shadow overflow-hidden">
 
-        {/* 全寬預覽圖 */}
+        {/* 全寬預覽圖（小圖也能填滿，靠模糊放大版當底） */}
         {previewUrl && (
-          <div className="gs-hero relative w-full h-52 bg-gray-100">
+          <div className="gs-hero relative w-full h-64 sm:h-72 bg-gray-900 overflow-hidden">
+            {/* 模糊放大版作為底層，避免左右大量空白 */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewUrl}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60 select-none"
+            />
+            {/* 主圖：等比縮放，置中 */}
             <Image
               src={previewUrl} alt="上傳的圖片"
-              fill className="object-contain" unoptimized
+              fill className="object-contain relative drop-shadow-xl" unoptimized
             />
             {/* 評級徽章 */}
-            <div className="gs-badge absolute top-3 right-3 px-3 py-1 rounded-full backdrop-blur-md bg-white/80 shadow-sm">
+            <div className="gs-badge absolute top-3 right-3 px-3 py-1 rounded-full backdrop-blur-md bg-white/80 shadow-sm z-10">
               <span
                 className="text-base font-black"
                 style={{

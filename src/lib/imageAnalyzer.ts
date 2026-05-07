@@ -192,19 +192,25 @@ function calcDpiLevels(pixelWidth: number, pixelHeight: number): DpiLevel[] {
   }))
 }
 
-export async function analyzeImage(file: File): Promise<ImageInfo> {
-  let blob: Blob = file
-
-  if (
+/**
+ * 取得可在瀏覽器 <img> 顯示的 Blob：
+ * - HEIC/HEIF → 轉成 JPEG（瀏覽器原生不支援 HEIC 預覽）
+ * - 其他格式 → 直接回傳原檔
+ */
+export async function getPreviewableBlob(file: File): Promise<Blob> {
+  const isHeic =
     file.type === 'image/heic' ||
     file.type === 'image/heif' ||
     file.name.toLowerCase().endsWith('.heic') ||
     file.name.toLowerCase().endsWith('.heif')
-  ) {
-    const heic2any = (await import('heic2any')).default
-    const result   = await heic2any({ blob: file, toType: 'image/jpeg' })
-    blob = Array.isArray(result) ? result[0] : result
-  }
+  if (!isHeic) return file
+  const heic2any = (await import('heic2any')).default
+  const result   = await heic2any({ blob: file, toType: 'image/jpeg' })
+  return Array.isArray(result) ? result[0] : result
+}
+
+export async function analyzeImage(file: File): Promise<ImageInfo> {
+  const blob = await getPreviewableBlob(file)
 
   const url = URL.createObjectURL(blob)
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import ImageUploader from '@/components/ImageUploader'
 import ResultPanel from '@/components/ResultPanel'
 import AspectRatioCalculator from '@/components/AspectRatioCalculator'
-import { analyzeImage, ImageInfo } from '@/lib/imageAnalyzer'
+import { analyzeImage, getPreviewableBlob, ImageInfo } from '@/lib/imageAnalyzer'
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false)
@@ -16,14 +16,17 @@ export default function Home() {
     setIsLoading(true)
     setError(null)
     setResult(null)
-    const url = URL.createObjectURL(file)
-    setPreviewUrl(url)
+    let url: string | null = null
     try {
+      // HEIC 需要先轉 JPEG 才能在瀏覽器預覽
+      const previewBlob = await getPreviewableBlob(file)
+      url = URL.createObjectURL(previewBlob)
+      setPreviewUrl(url)
       const info = await analyzeImage(file)
       setResult(info)
     } catch (e) {
       setError('無法分析此圖片，請確認檔案格式是否正確。')
-      URL.revokeObjectURL(url)
+      if (url) URL.revokeObjectURL(url)
       setPreviewUrl(null)
       console.error(e)
     } finally {

@@ -40,6 +40,34 @@
 
 ## 📋 開發記錄（最新在上）
 
+### [2026-05-08] Bug Fix + UI — HEIC 預覽修復 + 預覽區優化
+
+```
+- 角色：02_Developer + 04_UI_UX_Designer
+
+- Bug：iPhone HEIC 檔案可分析但預覽不顯示
+  - Root Cause：page.tsx 把原始 HEIC 直接給 URL.createObjectURL，
+    但瀏覽器 <img> 不支援 HEIC，預覽渲染失敗
+  - Fix：
+    - imageAnalyzer.ts 抽出 getPreviewableBlob() helper（HEIC → JPEG 轉換）
+    - 對外匯出供 page.tsx 使用
+    - page.tsx 在生成 previewUrl 之前先呼叫 getPreviewableBlob()
+    - analyzeImage 內部改用同一個 helper（清掉重複邏輯）
+
+- UI：預覽區視覺優化（小圖左右大量空白問題）
+  - 舊：h-52（208px）+ bg-gray-100 純色背景 + object-contain
+        小圖（如 600×400）顯示偏小，左右是大塊白色
+  - 新：h-64 sm:h-72（256/288px）
+        + 模糊放大版圖片作為底層（blur-2xl scale-110 opacity-60）
+        + 主圖在前 object-contain + drop-shadow-xl
+        + 任何長寬比的圖都填滿區塊，模糊背景跟主圖色調呼應
+  - 設計參考：Apple Music / Spotify 等 hero 區塊常用手法
+
+- 技術債：無新增
+```
+
+---
+
 ### [2026-05-08] Refactor — 5 區塊評級審查（P1 + P2a）+ 新增 3 個印刷尺寸
 
 ```
