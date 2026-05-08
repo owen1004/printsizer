@@ -106,11 +106,19 @@ export default function Home() {
         </div>
 
         {/* ── 自訂尺寸品質檢查（永遠顯示）── */}
-        <div className="pb-12">
+        <div className="pb-6">
           <AspectRatioCalculator
             pixelWidth={result?.width}
             pixelHeight={result?.height}
           />
+        </div>
+
+        {/* ── 免責聲明 ── */}
+        <div className="pb-12 text-center">
+          <p className="text-[11px] text-gray-400 leading-relaxed px-4">
+            本工具分析結果僅供參考，實際印刷品質會因印刷設備、紙張材質、油墨特性及輸出設定而有所差異。
+            最終印刷效果以實際印刷設備輸出為準，建議於正式印刷前向印刷廠確認規格。
+          </p>
         </div>
       </div>
       {/* ── 浮動 LINE 按鈕（永遠顯示）── */}

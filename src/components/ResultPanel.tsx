@@ -464,13 +464,15 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">各印刷尺寸品質</p>
         <p className="text-xs text-gray-500 mb-4">門檻按觀看距離分層（名片需 200 DPI、A4 需 150 DPI、易拉展遠看僅需 50 DPI）</p>
         <div className="space-y-1.5">
-          {info.maxPrintSizes.map((size) => {
-            // 全圖無可印時，把「可接受」緩衝層也壓成「不建議」，
-            // 避免跟主訊息「無法印任何標準尺寸」打架
+          {info.maxPrintSizes.flatMap((size, idx) => {
+            // 全圖無可印時，把「可接受」緩衝層也壓成「不建議」
             const effectiveQuality =
               noPrintable && size.printQuality === 'acceptable' ? 'poor' : size.printQuality
             const q = PRINT_QUALITY[effectiveQuality]
-            return (
+            const prev = idx > 0 ? info.maxPrintSizes[idx - 1] : null
+            const showSeparator = !noPrintable && prev?.canPrint === true && !size.canPrint
+
+            const row = (
               <div
                 key={size.name}
                 className={`gs-size-row flex items-center gap-3 rounded-xl px-4 py-3 transition-colors
@@ -485,6 +487,20 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
                 <span className={`text-xs font-semibold w-14 text-right flex-shrink-0 ${q.textColor}`}>{q.label}</span>
               </div>
             )
+
+            if (!showSeparator) return [row]
+
+            const separator = (
+              <div key="threshold-separator" className="relative flex items-center my-1">
+                <div className="flex-grow border-t border-dashed border-gray-300" />
+                <span className="flex-shrink-0 mx-3 text-[11px] font-semibold px-3 py-0.5 rounded-full bg-orange-50 text-orange-500 border border-orange-200 whitespace-nowrap">
+                  ⚠ 以下低於各尺寸最低印刷門檻
+                </span>
+                <div className="flex-grow border-t border-dashed border-gray-300" />
+              </div>
+            )
+
+            return [separator, row]
           })}
         </div>
       </div>

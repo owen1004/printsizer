@@ -55,20 +55,18 @@ const PRINT_SIZES: { name: string; desc: string; w: number; h: number; minDpi: n
   { name: '易拉展',    desc: 'X 架・展場立牌',     w: 80,    h: 200,    minDpi:  50 },
 ]
 
-// DPI → 印刷品質等級
-// 設計目標：5 個 tier 都要在大多數圖片中可見，避免「優秀直接跳勉強」斷層
-//   未達 minDpi 但 ≥ 0.6×minDpi → 勉強（警示，仍 canPrint=false 淡化）
-//   <  0.6×minDpi               → 不建議（明顯不足）
-//   ≥  minDpi 以上按絕對 DPI 對齊印刷專業標準：
-//     ≥ 300 → 極致（press-perfect 印刷頂規）
-//     ≥ 200 → 優秀（高品質印刷標準）
-//     其他  → 良好（達 minDpi 但 <200，用作優秀與勉強之間的過渡）
+// DPI → 印刷品質等級（全比例制，消除因絕對門檻導致的跳級斷層）
+//   ≥ minDpi × 2.0 → 極致
+//   ≥ minDpi × 1.2 → 優秀
+//   ≥ minDpi       → 良好（canPrint=true 最低門檻）
+//   ≥ minDpi × 0.6 → 勉強（canPrint=false，警示緩衝）
+//   <  minDpi × 0.6 → 不建議
 function dpiToPrintQuality(dpi: number, minDpi: number): PrintSize['printQuality'] {
   if (dpi < minDpi * 0.6) return 'poor'
   if (dpi < minDpi)       return 'acceptable'
-  if (dpi >= 300) return 'excellent'
-  if (dpi >= 200) return 'good'
-  return 'fair'  // 介於 minDpi 與 200 之間（過渡層）
+  if (dpi >= minDpi * 2.0) return 'excellent'
+  if (dpi >= minDpi * 1.2) return 'good'
+  return 'fair'
 }
 
 function gcd(a: number, b: number): number {
