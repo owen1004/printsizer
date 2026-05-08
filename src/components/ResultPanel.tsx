@@ -464,12 +464,14 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">各印刷尺寸品質</p>
         <p className="text-xs text-gray-500 mb-4">門檻按觀看距離分層（名片需 200 DPI、A4 需 150 DPI、易拉展遠看僅需 50 DPI）</p>
         <div className="space-y-1.5">
-          {info.maxPrintSizes.flatMap((size, idx) => {
+          {[...info.maxPrintSizes]
+            .sort((a, b) => (b.canPrint ? 1 : 0) - (a.canPrint ? 1 : 0) || b.dpi - a.dpi)
+            .flatMap((size, idx, arr) => {
             // 全圖無可印時，把「可接受」緩衝層也壓成「不建議」
             const effectiveQuality =
               noPrintable && size.printQuality === 'acceptable' ? 'poor' : size.printQuality
             const q = PRINT_QUALITY[effectiveQuality]
-            const prev = idx > 0 ? info.maxPrintSizes[idx - 1] : null
+            const prev = idx > 0 ? arr[idx - 1] : null
             const showSeparator = !noPrintable && prev?.canPrint === true && !size.canPrint
 
             const row = (
