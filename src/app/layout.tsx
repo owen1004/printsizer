@@ -34,6 +34,9 @@ export const metadata: Metadata = {
   authors: [{ name: 'Owen Studio', url: 'https://owenstudio.netlify.app' }],
   creator: 'Owen Studio',
   publisher: 'Owen Studio',
+  verification: {
+    google: 'FZIa2sMfzXnYR-Ao91goEB5026Q7kmRXPiBKJWMkyb0',
+  },
   robots: {
     index: true,
     follow: true,
