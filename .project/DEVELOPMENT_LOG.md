@@ -40,6 +40,53 @@
 
 ## 📋 開發記錄（最新在上）
 
+### [2026-05-10] 專案收尾 — GA + SEO 完整整合 + 版本存檔
+
+```
+- 角色：06_DevOps_Release + 09_Senior_PM
+- 狀態：專案正式收尾，不再開發新功能
+
+Google Analytics：
+  - 安裝 @next/third-parties/google（官方推薦，afterInteractive 策略不阻塞 LCP）
+  - GA Measurement ID：G-MNFRXZMMMJ，hardcode 為 fallback（公開資訊，Hobby 方案無獨立 Env Vars 入口）
+
+SEO 強化（layout.tsx）：
+  - metadataBase：修正 OG image URL 自動展開為完整路徑
+  - title template：%s | PrintSizer
+  - description 強化：加入支援格式、不上傳等關鍵賣點
+  - keywords：印刷相關中文關鍵字 14 組
+  - canonical URL：https://printsizer.vercel.app
+  - robots meta：index + follow + googleBot 設定
+  - verification.google：FZIa2sMfzXnYR-Ao91goEB5026Q7kmRXPiBKJWMkyb0
+  - OpenGraph：補強描述，修正 siteName URL
+  - JSON-LD WebApplication：結構化資料，Google 可能顯示 App 資訊卡片
+
+新增檔案：
+  - src/app/robots.ts → 自動生成 /robots.txt
+  - src/app/sitemap.ts → 自動生成 /sitemap.xml
+  - public/og-image.png → 社群分享預覽圖（1200×630）
+
+DPI 排序修復：
+  - ResultPanel.tsx：渲染前對 maxPrintSizes 做 canPrint desc + DPI desc 排序
+  - 解決「優秀出現在良好下方」的非單調視覺問題
+
+Commits：
+  - 19d5024 fix(ResultPanel): 按 DPI 降序排列尺寸清單
+  - d42cb97 feat: GA + SEO metadata + JSON-LD + robots + sitemap
+  - 17dcb2e fix: hardcode GA ID as fallback
+  - b1882f8 feat: Google Search Console 驗證 meta tag
+  - 3d11c64 chore: og-image.png + package.json
+
+待用戶確認：
+  - [ ] GSC 按驗證按鈕（meta tag 已部署）
+  - [ ] GSC 提交 sitemap.xml
+  - [ ] 24h 後確認 GA 有流量資料
+
+技術債：無新增
+```
+
+---
+
 ### [2026-05-08] Feature — 安裝 Vercel Speed Insights
 
 ```
