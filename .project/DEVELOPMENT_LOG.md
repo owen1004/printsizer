@@ -40,6 +40,33 @@
 
 ## 📋 開發記錄（最新在上）
 
+### [2026-05-10] Feature — CTA 上方新增「重新上傳圖片」按鈕
+
+```
+- 角色：14_Frontend_Engineer + 04_UI_UX_Designer
+- 觸發：用戶希望在「確認好尺寸了？讓我幫你印出來」卡片上方也能重新上傳
+
+- 改動：
+  ResultPanel.tsx
+  - 在 else（可印）分支的 gs-cta 上方插入「↩ 重新上傳圖片」按鈕
+  - 使用 React Fragment 包住按鈕 + gs-cta，保持 JSX 結構正確
+
+  動畫除錯過程：
+  1. 先用 animate-fade-in-up animate-delay-300 → 時序太早（在卡片前出現）
+  2. 改用 GSAP tl.from('.gs-reset-top', ...) → 條件渲染導致 opacity:0 卡住不還原
+  3. 最終方案：CSS 動畫 + 新增 animate-delay-900（0.95s）
+     → 對齊 gs-card stagger 全部完成後的時間點，在「建議印製尺寸」卡片後出現
+
+  globals.css
+  - 新增 animate-delay-500（0.55s）、animate-delay-700（0.75s）、animate-delay-900（0.95s）
+
+- 技術學習：GSAP tl.from() 對條件渲染元素不可靠，改用 CSS animation + 精算 delay 更穩定
+- Commit：4d66f40
+- 技術債：無新增
+```
+
+---
+
 ### [2026-05-10] 專案收尾 — GA + SEO 完整整合 + 版本存檔
 
 ```
