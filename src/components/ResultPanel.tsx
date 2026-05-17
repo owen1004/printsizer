@@ -395,6 +395,18 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
           </div>
         </div>
       ) : (
+        <>
+          {/* ── 重新上傳（CTA 上方）── */}
+          <button
+            onClick={onReset}
+            className="animate-fade-in-up animate-delay-900 w-full py-3.5 rounded-2xl bg-white apple-shadow border border-gray-200
+                       text-gray-600 font-semibold text-sm tracking-tight
+                       hover:border-cyan-300 hover:text-cyan-600
+                       active:scale-[0.98] transition-all duration-200"
+          >
+            ↩ 重新上傳圖片
+          </button>
+
         <div className="gs-cta bg-white rounded-3xl apple-shadow overflow-hidden">
           <div className="h-[3px] bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400" />
           <div className="p-5">
@@ -428,6 +440,7 @@ export default function ResultPanel({ info, previewUrl, onReset }: Props) {
             </div>
           </div>
         </div>
+        </>
       )}
 
       {/* ── DPI 等級對照表（不足狀態下隱藏，避免跟主評級訊號矛盾）── */}

@@ -16,6 +16,9 @@
   .animate-delay-100 { animation-delay: 0.08s; }
   .animate-delay-200 { animation-delay: 0.16s; }
   .animate-delay-300 { animation-delay: 0.24s; }
+  .animate-delay-500 { animation-delay: 0.55s; }
+  .animate-delay-700 { animation-delay: 0.75s; }
+  .animate-delay-900 { animation-delay: 0.95s; }
 
   .animate-pulse-warm {
     animation: pulseWarm 2.8s ease-in-out infinite;
